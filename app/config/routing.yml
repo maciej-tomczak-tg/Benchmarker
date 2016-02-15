@@ -1,0 +1,8 @@
+benchmarker:
+    resource: "@BenchmarkerBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+app:
+    resource: "@BenchmarkerBundle/Controller/"
+    type:     annotation

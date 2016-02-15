@@ -1,0 +1,14 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+    {% if benchmark is not null %}
+        {% if benchmark.haveValidResults %}
+            {% include '@Benchmarker/report/report.html.twig' %}
+        {%  else %}
+            <h2>Sorry, can't present results - no valid results(maybe you typed unreachable sites ?)</h2>
+        {% endif %}
+    {% endif %}
+{% endblock %}

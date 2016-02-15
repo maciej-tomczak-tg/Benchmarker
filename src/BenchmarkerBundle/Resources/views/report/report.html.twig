@@ -1,0 +1,38 @@
+<h2>Results</h2>
+{% if benchmark is not null %}
+    Test performed on {{ benchmark.runDate|date('Y-m-d H:i:s') }}
+    <h4>Tested site: {{ benchmark.siteToBenchmark.url }}</h4>
+    <table>
+        <thead>
+        <tr>
+            <td>Url</td>
+            <td>Test time</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ benchmark.siteToBenchmark.url }}</td>
+            <td>{{ site_loading_time(benchmark.siteToBenchmark) }}</td>
+        </tr>
+        </tbody>
+    </table>
+    <h4>Tested sites to compare:</h4>
+    <table>
+        <thead>
+        <tr>
+            <td>Url</td>
+            <td>Test time</td>
+            <td>In Comparison to tested site</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for site in benchmark.sitesToCompare %}
+            <tr>
+                <td>{{ site.url }}</td>
+                <td>{{ site_loading_time(site) }}</td>
+                <td>{{ compare_time_percent(benchmark.siteToBenchmark, site, 2) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

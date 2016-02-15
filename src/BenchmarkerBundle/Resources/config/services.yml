@@ -1,0 +1,50 @@
+services:
+    benchmarker.form.type.sites:
+        class: BenchmarkerBundle\Form\Type\SitesType
+        arguments: [@benchmarker.form.transformer.benchmark_data_transformer]
+        tags:
+            - { name: form.type }
+    benchmarker.form.transformer.benchmark_data_transformer:
+        class: BenchmarkerBundle\Form\Transformer\BenchmarkDataTransformer
+        arguments: [@benchmarker.factory.benchmark_factory]
+    benchmarker.factory.benchmark_factory:
+        class: BenchmarkerBundle\Factory\BenchmarkFactory
+    benchmarker.service.load_time_service:
+        class: BenchmarkerBundle\Service\SimpleLoadTimeService
+    benchmarker.service.benchmark_service:
+        class: BenchmarkerBundle\Service\BenchmarkService
+        arguments: [ @benchmarker.service.load_time_service ]
+    benchmarker.event_listener.benchmarker_event_listener:
+        class: BenchmarkerBundle\EventListener\BenchmarkerEventListener
+        arguments: [@benchmarker.service.file_report_logger_service, @benchmarker.report.report_dispatcher]
+        tags:
+        - { name: kernel.event_subscriber }
+    benchmarker.twig_extension.load_time_comparator:
+        class: BenchmarkerBundle\Twig\Extension\LoadTimeComparator
+        calls:
+            - [ initRuntime, [ @twig ] ]
+        tags:
+            - { name: twig.extension }
+    benchmarker.service.file_report_logger_service:
+        class: BenchmarkerBundle\Service\FileReportLoggerService
+        arguments: [ %benchmarker.log_file_name% ] #injected by Extension
+    benchmarker.report.report_dispatcher:
+        class: BenchmarkerBundle\Report\ReportDispatcher
+    benchmarker.service.concrete_sms_api:
+        class: BenchmarkerBundle\Service\ConcreteSmsApi
+    benchmarker.report.sms_reporter:
+        class: BenchmarkerBundle\Report\SmsReporter
+        arguments: [ @benchmarker.service.concrete_sms_api, @benchmarker.factory.benchmark_reporters_factory, %benchmarker.sms_reporter.ratio%, %benchmarker.sms_reporter.phone% ]
+        tags:
+        - { name: benchmarker.report }
+    benchmarker.service.email_service:
+        class: BenchmarkerBundle\Service\EmailService
+        arguments: [ @mailer ]
+    benchmarker.report.email_reporter:
+        class: BenchmarkerBundle\Report\EmailReporter
+        arguments: [ @benchmarker.service.email_service, @benchmarker.factory.benchmark_reporters_factory, %benchmarker.email_reporter.ratio%, %benchmarker.email_reporter.address% ] #injected in Extension
+        tags:
+        - { name: benchmarker.report }
+    benchmarker.factory.benchmark_reporters_factory:
+        class: BenchmarkerBundle\Factory\BenchmarkReportersFactory
+        arguments: [ @templating, %benchmarker.email_reporter.email_template% ]
